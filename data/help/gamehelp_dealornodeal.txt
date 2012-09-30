@@ -1,0 +1,4 @@
+In order to open a case, type: !case <casenumber>
+In order to say "Deal" or "No Deal", type: !deal or !nodeal
+To see which cases are left to open, type: !casesleft
+To see which values have not been revealed yet, type: !valuesleft

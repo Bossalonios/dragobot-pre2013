@@ -1,0 +1,3 @@
+In order to guess a letter, type: !guess <letter> or !letter <letter>
+In order to guess the entire word (solve the puzzle), type: !solve <word>
+In order to view the letters you've already guessed, type: !guessedletters

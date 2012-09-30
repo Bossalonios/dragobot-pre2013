@@ -1,0 +1,6 @@
+In order to enter a guess, simply type any 4-digit number (no triggers necessary).
+When a guess is entered, the following will pop up:
+[Example] 1. 1234  1A2B  Score: 200 (+200)
+The "xAxB" number gives you a clue as to what the number is.
+The number before "A" tells you how many digits in your guess are in the secret number, in the same position.
+The number before "B" tells you how many digits in your guess are in the secret number, but in a different position.

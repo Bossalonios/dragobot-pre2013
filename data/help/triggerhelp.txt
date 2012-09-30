@@ -1,0 +1,9 @@
+Games:
+For help on game triggers, type: !dragobot gamehelp
+Random:
+!wrap      I'll wrap around you.
+?wrap      I'll wrap around somebody random.
+%wrap      I'll wrap around Holt.
+Services:
+!help	   Prints a help message explaining that you should use !dragobot help instead.
+!dragobot  Prints my main message.

@@ -1,0 +1,2 @@
+In order to guess whether the next card in the deck will be higher or lower, simply type !higher or !lower. That's all there is to it!
+Twos are low, aces are high.
