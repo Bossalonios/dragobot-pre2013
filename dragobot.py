@@ -10,6 +10,8 @@ import select
 import random
 import os.path
 import string
+
+import math
 from random import randint
 
 # Basic bot info
@@ -38,6 +40,9 @@ def now():
 
 def timer():
 	return time.time()
+
+def logint(index): # logarithmic interpolation
+	return math.log(1 + index) / math.log(2)
 
 alphanumstring = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 alphastring = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -197,27 +202,27 @@ def list_users(channel):
 
 def lettergrade(grade):
 	if grade >= 100:
-		return "SSS - Perfect!"
+		return ["SSS", " Perfect!"]
 	if grade >= 95:
-		return "SS - Awesome!"
+		return ["SS", "Awesome!"]
 	if grade >= 90:
-		return "S - Excellent!"
+		return ["S", "Excellent!"]
 	if grade >= 80:
-		return "A - Great job!"
+		return ["A", "Great job!"]
 	if grade >= 70:
-		return "B - Pretty good!"
+		return ["B", "Pretty good!"]
 	if grade >= 55:
-		return "C - Fairly decent."
+		return ["C", "Fairly decent."]
 	if grade >= 40:
-		return "D - Keep working at it."
+		return ["D", "Keep working at it."]
 	if grade >= 20:
-		return "E - Better luck next time."
+		return ["E", "Better luck next time."]
 	if grade >= 0:
-		return "F - Try a little harder next time."
+		return ["F", "Try a little harder next time."]
 	if grade >= -25:
-		return "FF - Try harder next time."
+		return ["FF", "Try harder next time."]
 
-	return "FFF - Try much harder next time."
+	return ["FFF", "Try much harder next time."]
 
 games = []
 
@@ -341,9 +346,9 @@ def hangmangrade(time, theword, hintmask, wrongs, maxwrongs, solved):
 	
 	perftime = 60
 	failtime = 300
-	# perfect time = 6 seconds
+	# perfect time = 60 seconds
 	# -30% = 300 seconds
-	grade -= max(float(time - perftime), 0) / float(failtime - perftime) * 30
+	grade -= logint( max(float(time - perftime), 0) / float(failtime - perftime) ) * 30
 
 	print "Unguessed letters solved: %s/%s" % (ung_let, letters)
 	print "Wrong guesses used: %s/%s" % (wrongs, maxwrongs)
@@ -415,7 +420,8 @@ class HangmanGame:
 				send_message(self.player, "You guessed all the letters! The answer was: %s" % (self.theword))
 				
 				finalgrade = hangmangrade(timer() - self.starttime, self.theword, self.guessmask, self.wrongguesses, self.maxwrongguesses, True)
-				send_message(self.player, "Your rank: %s" % (lettergrade(finalgrade)))
+				grade = lettergrade(finalgrade)  # the letter grade itself, and the flavour text
+				send_message(self.player, "Your rank: %s - %s" % (grade[0], grade[1]))
 				
 				self.over = True
 
@@ -427,7 +433,8 @@ class HangmanGame:
 				send_message(self.player, "Game over! The answer was: %s" % (self.theword))
 
 				finalgrade = hangmangrade(timer() - self.starttime, self.theword, self.guessmask, self.wrongguesses, self.maxwrongguesses, False)
-				send_message(self.player, "Your rank: %s" % (lettergrade(finalgrade)))
+				grade = lettergrade(finalgrade)  # the letter grade itself, and the flavour text
+				send_message(self.player, "Your rank: %s - %s" % (grade[0], grade[1]))
 				
 				self.over = True
 
@@ -463,7 +470,8 @@ class HangmanGame:
 					send_message(self.player, "You got it. The answer was: %s" % (self.theword))
 					
 					finalgrade = hangmangrade(timer() - self.starttime, self.theword, self.guessmask, self.wrongguesses, self.maxwrongguesses, True)
-					send_message(self.player, "Your rank: %s" % (lettergrade(finalgrade)))
+					grade = lettergrade(finalgrade)  # the letter grade itself, and the flavour text
+					send_message(self.player, "Your rank: %s - %s" % (grade[0], grade[1]))
 					
 					self.over = True
 				else:
@@ -474,7 +482,8 @@ class HangmanGame:
 						send_message(self.player, "Game over! The answer was: %s" % (self.theword))
 						
 						finalgrade = hangmangrade(timer() - self.starttime, self.theword, self.guessmask, self.wrongguesses, self.maxwrongguesses, False)
-						send_message(self.player, "Your rank: %s" % (lettergrade(finalgrade)))
+						grade = lettergrade(finalgrade)  # the letter grade itself, and the flavour text
+						send_message(self.player, "Your rank: %s - %s" % (grade[0], grade[1]))
 						
 						self.over = True
 
@@ -494,6 +503,8 @@ pokemonlist = []
 pokemonflavortexts = []
 typelist = ["Normal", "Fighting", "Flying", "Poison", "Ground", "Rock", "Bug", "Ghost", "Steel", "Fire", "Water", "Grass", "Electric", "Psychic", "Ice", "Dragon", "Dark"]
 
+repeats = []
+
 class PokemonData:
 	
 	def __init__(self):
@@ -507,10 +518,10 @@ def pokemongrade(time, hints):
 	grade = 100
 
 	perftime = 0
-	failtime = 60
+	failtime = 90
 
-	# -50 at 1 minute
-	grade -= max(float(time - perftime), 0) / float(failtime - perftime) * 50
+	# -50 at 1 minute, 30 seconds
+	grade -= logint( max(float(time - perftime), 0) / float(failtime - perftime) ) * 50
 
 	# -20 points per hint
 	grade -= hints * 20
@@ -521,16 +532,27 @@ def pokemongrade(time, hints):
 
 	return grade
 	
-
+# Don't repeat the last (n) Pokémon.
+REPEATLIMIT = 50
 
 class PokemonGame:
 	
 	def __init__(self, player):
+
+		global repeats
+
 		self.player = player
 		self.gametype = "pokemon"
 		self.over = False
 
+		# repeat avoidance code.
 		pokemon = pokemonlist[randint(0, 648)]
+		while pokemon in repeats:
+			pokemon = pokemonlist[randint(0, 648)]
+		repeats += [pokemon]
+		if len(repeats) > REPEATLIMIT:
+			repeats.pop(0)
+
 		self.thepokemon = pokemon
 		self.theword = pokemon.name
 		self.hintmask = ["_"] * len(pokemon.name)
@@ -552,7 +574,8 @@ class PokemonGame:
 				finalgrade = pokemongrade(finishtime - self.elapstimestart, self.totalhints)
 
 				send_message(self.player, "You got it, %s! The Pokémon's name was %s." % (msg.sender, self.theword))
-				send_message(self.player, "Your rank: %s" % (lettergrade(finalgrade)))
+				grade = lettergrade(finalgrade)  # the letter grade itself, and the flavour text
+				send_message(self.player, "Your rank: %s (%s) - %s" % (grade[0], "%.2f%%" % finalgrade, grade[1]))
 				self.over = True
 
 			elif msg.message.lower() == "!pokemonhint" or msg.message.lower() == "!ph":
