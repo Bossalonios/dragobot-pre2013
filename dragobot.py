@@ -1404,6 +1404,7 @@ def interp(message):
 # load the configuration
 conffile = open("config/drago.conf", "r")
 network = conffile.readline().strip()
+port = int(conffile.readline().strip())
 channels = conffile.readline().strip().split(" ")
 
 # load the Hangman word list
@@ -1443,7 +1444,7 @@ print "done."
 ############
 
 # network = "irc.systemnet.info"
-port = 6667
+# port = 6667
 
 # channels = ["bottest", "bulbagarden", "pandemonium"]
 #channels = ["bottest"]
@@ -1451,6 +1452,8 @@ port = 6667
 # logon procedure
 
 irc.connect ( ( network, port ) )
+
+print "Connected to %s." % network
 
 irc.send ( "NICK " + nickname + "\r\n" )
 irc.send ( "USER " + username + " 8 * :" + realname + "\r\n" )
@@ -1463,6 +1466,7 @@ irc.send ( "USER " + username + " 8 * :" + realname + "\r\n" )
 while True:
 	msgbuf += irc.recv(PACKSIZE)
 	donefirstloop = False
+
 	while True:
 		if msgbuf.find("\r\n") == -1:
 			break
