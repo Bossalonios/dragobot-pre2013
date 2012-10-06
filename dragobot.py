@@ -124,6 +124,13 @@ def message(line):
 
 		else:
 			print "[%s] Received a message from %s (%s) to %s:\n   %s" % (now(), msg.sender, msg.senderhostname, msg.receiver, cleanmessage(msg.message))
+	
+	if msg.msgtype == "NOTICE":
+		# Received a NOTICE.
+		content = splitline[2].split(" ", 1)
+		msg.receiver = content[0]
+		msg.message = content[1][1:]
+		print "[%s] Received a notice from %s (%s) to %s:\n   %s" % (now(), msg.sender, msg.senderhostname, msg.receiver, cleanmessage(msg.message))
 
 	if msg.msgtype == "KICK":
 		# Oh no, Dragobot has been kicked!
