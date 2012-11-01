@@ -1,0 +1,9 @@
+All RPN calculations are done in a stack, which holds all the numbers
+that are currently being used. For more information on RPN, visit the
+Wikipedia page: http://en.wikipedia.org/wiki/Reverse_Polish_Notation
+!rpn -> displays the number currently at the top of the stack
+!rpn 2 -> displays "2" and adds it to the stack
+!rpn 2 + -> adds 2 to the number currently at the top of the stack
+!rpn 3 2 + -> displays "5" and adds it to the stack
+!rpn 3 6 * 2 + -> displays "20" and adds it to the stack
+!rpn 6 9 8 * 2 3 + - + / -> divides the number currently at the top of the stack by 74

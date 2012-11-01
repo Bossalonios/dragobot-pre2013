@@ -4,6 +4,8 @@ Each command has its own parameters.
 about         Prints an about message.
 gamehelp      Prints a help message for the games.
 help          Prints this message.
+rpnhelp       Prints the help message for the RPN.
+rpnexample    Prints example inputs for the RPN calculator.
 quit          Makes me quit. Can only be used by my operator.
 triggers      Lists all triggers that I will respond to.
 triggerhelp   Prints a help message explaining what each trigger does.

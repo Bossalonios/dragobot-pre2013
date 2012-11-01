@@ -4,6 +4,7 @@ Random:
 !wrap      I'll wrap around you.
 ?wrap      I'll wrap around somebody random.
 %wrap      I'll wrap around Holt.
+!rpn       Calculates using Reverse Polish Notation. For help on this, type !dragobot rpnhelp
 Services:
 !help	   Prints a help message explaining that you should use !dragobot help instead.
 !dragobot  Prints my main message.

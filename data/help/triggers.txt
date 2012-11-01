@@ -1,6 +1,7 @@
 My available triggers are the following:
-Games: !mastermind !hangman !namethatpokemon !dealornodeal !higherorlower
+Games: !mastermind !hangman !namethatpokemon
+       !dealornodeal !higherorlower
        !mm !hm !ntp !dond !hol
-Random: !wrap ?wrap %wrap
+Random: !wrap ?wrap %wrap !rpn
 Services: !help !dragobot
 If you want to know what these triggers do, type: !dragobot triggerhelp

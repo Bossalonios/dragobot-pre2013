@@ -1,0 +1,7 @@
+Syntax: !rpn <number | operator | reset>*
+Currently allowed operators: + - * / mod sqrt AC C
+Typing in "reset" or "AC" anywhere will clear the stack. Typing in "cancel", "C", or "CE" will clear the last number off the top of the stack.
+Typing in a command with a number at the end will display that number at the end of the stack after performing all the requested operations.
+Typing in a blank !rpn command will display the number currently at the top.
+If there is an error, the computation as input will immediately cease and the number at the top of the stack will be returned.
+For example inputs, type !dragobot rpnexample.
