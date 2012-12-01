@@ -20,8 +20,8 @@ irc = socket.socket ( socket.AF_INET, socket.SOCK_STREAM )
 msgbuf = ""
 PACKSIZE = 512
 
-nickname = "Dragobot"
 basenick = "Dragobot"
+nickname = basenick
 
 username = "dragobot"
 realname = "Dragobot"
@@ -972,183 +972,6 @@ class HigherOrLowerGame:
 
 
 
-
-
-##########################
-### RPN calculator
-##########################
-
-def is_numeric(s):
-    try:
-        float(s)
-        return True
-    except ValueError:
-        return False
-
-def intrep(number):
-    if(number == float("inf")):
-        return "Infinity"
-    if(math.isnan(number)):
-        return "NaN"
-    # determine when to use scientific notation
-    if abs(number) > 1000000000 or abs(number) < 0.000000001:
-        return "%.10g" % number
-    if(round(number, 10) == int(number)):
-        return int(number)
-    else:
-        return "%.10f" % round(number, 10)
-
-
-rpn_stack = []
-memory = 0
-
-def rpncalc(stack, sender):
-        global memory
-        global rpn_stack
-        for elt in stack:
-
-                    # numbers
-                if is_numeric(elt):
-                        rpn_stack.append(float(elt))
-                        print "New stack:", rpn_stack
-
-                        
-                    # calculator buttons
-                elif elt == "reset" or elt.upper() == "AC":
-                        del rpn_stack[0:len(rpn_stack)]
-                elif (elt == "cancel" or elt.upper() == "C" or elt.upper() == "CE") and len(rpn_stack) >= 1:
-                        rpn_stack.pop() # and do nothing with it
-
-
-                    # memory operations
-                elif (elt.upper() == "M-") and len(rpn_stack) >= 1:
-                        memory -= rpn_stack.pop()
-                        print ("Memory: %s" % intrep(memory))
-                elif (elt.upper() == "M+") and len(rpn_stack) >= 1:
-                        memory += rpn_stack.pop()
-                        print ("Memory: %s" % intrep(memory))
-                elif (elt.upper() == "MR") and len(rpn_stack) >= 1:
-                        send_message(sender, "Memory: %s" % intrep(memory))
-                elif (elt.upper() == "MC") and len(rpn_stack) >= 1:
-                        memory = 0
-                        send_message(sender, "Memory has been cleared.")
-
-
-                    # constants
-                elif elt == "e":
-                        rpn_stack.append(math.e)
-                elif elt == "p" or elt == "pi":
-                        rpn_stack.append(math.e)
-
-
-                    # operators
-                elif elt == "+":
-                        if len(rpn_stack) < 2:
-                                send_message(sender, "Error: +: not enough items in stack!")
-                                break
-                        else:
-                                b = rpn_stack.pop()
-                                a = rpn_stack.pop()
-                                rpn_stack.append(a + b)
-                                print ("Result of RPN +: %s" % rpn_stack[len(rpn_stack)-1])
-                                print "Remaining stack:", (rpn_stack)
-                                
-                elif elt == "-":
-                        if len(rpn_stack) < 2:
-                                send_message(sender, "Error: -: not enough items in stack!")
-                                break
-                        else:
-                                b = rpn_stack.pop()
-                                a = rpn_stack.pop()
-                                rpn_stack.append(a - b)
-                                print ("Result of RPN -: %s" % rpn_stack[len(rpn_stack)-1])
-                                print "Remaining stack:", (rpn_stack)
-                                
-                elif elt == "*":
-                        if len(rpn_stack) < 2:
-                                send_message(sender, "Error: *: not enough items in stack!")
-                                break
-                        else:
-                                b = rpn_stack.pop()
-                                a = rpn_stack.pop()
-                                rpn_stack.append(a * b)
-                                print ("Result of RPN *: %s" % rpn_stack[len(rpn_stack)-1])
-                                print "Remaining stack:", (rpn_stack)
-                                
-                elif elt == "/":
-                        if len(rpn_stack) < 2:
-                                send_message(sender, "Error: /: not enough items in stack!")
-                                break
-                        else:
-                                b = rpn_stack.pop()
-                                if(b == 0):
-                                        send_message(sender, "Error: %: attempting to divide by 0!")
-                                        break
-                                a = rpn_stack.pop()
-                                rpn_stack.append(float(a) / float(b))
-                                print ("Result of RPN /: %s" % rpn_stack[len(rpn_stack)-1])
-                                print "Remaining stack:", (rpn_stack)
-                                
-                elif elt == "^" or elt == "**" or elt == "pwr":
-                        if len(rpn_stack) < 2:
-                                send_message(sender, "Error: ^: not enough items in stack!")
-                        else:
-                                b = rpn_stack.pop()
-                                a = rpn_stack.pop()
-                                if(a == 0 and b <= 0 or a < 0 and b != int(b)):
-                                        send_message(sender, "Error: ^: invalid input!")
-                                        break
-                                rpn_stack.append(a ** b)
-                                print ("Result of RPN ^: %s" % rpn_stack[len(rpn_stack)-1])
-                                print "Remaining stack:", (rpn_stack)
-                                
-                elif elt == "mod":
-                        if len(rpn_stack) < 2:
-                                send_message(sender, "Error: mod: not enough items in stack!")
-                        else:
-                                b = rpn_stack.pop()
-                                if(b == 0):
-                                        send_message(sender, "Error: mod: attempting to take mod of 0!")
-                                        break
-                                a = rpn_stack.pop()
-                                rpn_stack.append(a % b)
-                                print ("Result of RPN mod: %s" % rpn_stack[len(rpn_stack)-1])
-                                print "Remaining stack:", (rpn_stack)
-                                
-                elif elt == "sqr":
-                        if len(rpn_stack) < 1:
-                                send_message(sender, "Error: sqr: not enough items in stack!")
-                        else:
-                                a = rpn_stack.pop()
-                                if(a < 0):
-                                        send_message(sender, "Error: sqr: input is negative!")
-                                        break
-                                rpn_stack.append(a * a)
-                                print ("Result of RPN sqr: %s" % rpn_stack[len(rpn_stack)-1])
-                                print "Remaining stack:", (rpn_stack)
-                                
-                elif elt == "sqrt":
-                        if len(rpn_stack) < 1:
-                                send_message(sender, "Error: sqrt: not enough items in stack!")
-                        else:
-                                a = rpn_stack.pop()
-                                if(a < 0):
-                                        send_message(sender, "Error: sqrt: input is negative!")
-                                        break
-                                rpn_stack.append(math.sqrt(a))
-                                print ("Result of RPN sqrt: %s" % rpn_stack[len(rpn_stack)-1])
-                                print "Remaining stack:", (rpn_stack)
-
-                                
-                # don't do anything for other inputs
-        if(len(rpn_stack) < 1):
-                send_message(sender, "The stack is empty.")
-        else:
-                send_message(sender, "Result: %s" % intrep(rpn_stack[len(rpn_stack)-1]))
-
-
-
-
 ##########################
 ### Memes, chat responses, et al.
 ##########################
@@ -1190,22 +1013,22 @@ def interp_chat(message):
 
     # "open the pod bay doors" scene
 
-#   if rawmessage.find("do you read me") != -1:
-#       send_message(recipient, "Affirmative, %s. I read you." % message.sender)
-#   if rawmessage.find("open the pod bay doors") != -1:
-#       send_message(recipient, "I'm afraid I can't do that, %s." % message.sender)
-#   if rawmessage.find("whats the problem") != -1:
-#       send_message(recipient, "I think you know what the problem is just as well as I do.")
-#   if rawmessage.find("what are you talking about") != -1:
-#       send_message(recipient, "This mission is too important for me to allow you to jeopardize it.")
-#   if rawmessage.find("i dont know what youre talking about") != -1:
-#       send_message(recipient, "I know that you and Frank are planning to disconnect me, and I'm afraid that's something I cannot allow to happen.")
-#   if rawmessage.find("where the hell did you get that idea") != -1:
-#       send_message(recipient, "%s, although you took very throrough precautions in the pod against my hearing you, I could see your lips move." % message.sender)
-#   if rawmessage.find("through the emergency airlock") != -1:
-#       send_message(recipient, "Without your space helmet, %s? You're going to find that rather difficult." % message.sender)
-#   if rawmessage.find("argue with you anymore") != -1:
-#       send_message(recipient, "%s, this conversation can serve no purpose anymore. Goodbye." % message.sender)
+   if rawmessage.find("do you read me") != -1:
+       send_message(recipient, "Affirmative, %s. I read you." % message.sender)
+   if rawmessage.find("open the pod bay doors") != -1:
+       send_message(recipient, "I'm afraid I can't do that, %s." % message.sender)
+   if rawmessage.find("whats the problem") != -1:
+       send_message(recipient, "I think you know what the problem is just as well as I do.")
+   if rawmessage.find("what are you talking about") != -1:
+       send_message(recipient, "This mission is too important for me to allow you to jeopardize it.")
+   if rawmessage.find("i dont know what youre talking about") != -1:
+       send_message(recipient, "I know that you and Frank are planning to disconnect me, and I'm afraid that's something I cannot allow to happen.")
+   if rawmessage.find("where the hell did you get that idea") != -1:
+       send_message(recipient, "%s, although you took very throrough precautions in the pod against my hearing you, I could see your lips move." % message.sender)
+   if rawmessage.find("through the emergency airlock") != -1:
+       send_message(recipient, "Without your space helmet, %s? You're going to find that rather difficult." % message.sender)
+   if rawmessage.find("argue with you anymore") != -1:
+       send_message(recipient, "%s, this conversation can serve no purpose anymore. Goodbye." % message.sender)
 
         
     if "smuglord" in rawmessage and "is" in rawmessage and "druglord" in rawmessage and not "not" in rawmessage:
@@ -1214,7 +1037,7 @@ def interp_chat(message):
 
 
 
-fuzzydegree = 5
+fuzzydegree = 5 # can only be 5 or 15
 
 ################
 # CTCP commands
@@ -1386,6 +1209,7 @@ def default_message(recipient):
     for line in helpfile:
         send_message(recipient, line)
 
+<<<<<<< Updated upstream
 def send_helpfile(openfile, recipient):
     helpfile = open(openfile, "r")
     for line in helpfile:
@@ -1441,6 +1265,57 @@ def parse_dragobot_command(message, sender, recipient):
     
     else:
         default_message(recipient)
+=======
+def open_helpfile(recipient, helpfilename):
+	helpfile = open(helpfilename, "r")
+	for line in helpfile:
+		send_message(recipient, line)
+
+
+def parse_dragobot_command(message, sender, recipient):
+	
+	splitmsg1 = message.strip().split(" ", 1)
+	command = splitmsg1[0]
+
+	if command == "about":
+		send_message(recipient, "Dragobot v.%s (last compiled: %s)" % (version, buildtime))
+		send_message(recipient, "Dragobot, a Python IRC bot that plays games")
+		send_message(recipient, "© 2012 Joe Zeng, all rights reserved. http://joezeng.com/")
+
+	elif command == "gamehelp":
+		if len(splitmsg1) == 1:
+			open_helpfile(recipient, "data/help/gamehelp.txt")
+		else:
+		# help for games
+			param = splitmsg1[1].strip("!")
+			if param == "mastermind" or \
+			param == "dealornodeal" or \
+			param == "namethatpokemon" or \
+			param == "hangman" or \
+			param == "higherorlower":
+				open_helpfile(recipient, "data/help/gamehelp_%s.txt" % param)
+
+	elif command == "help":
+		open_helpfile(recipient, "data/help/help.txt")
+	
+	elif command == "triggers":
+		if len(splitmsg1) == 1:
+			open_helpfile(recipient, "data/help/triggers.txt")
+		
+	elif command == "triggerhelp":
+		open_helpfile(recipient, "data/help/triggerhelp.txt")
+
+	elif command == "quit":
+		if sender == "Dragonaire":
+			# quit completely
+			irc.send ( "QUIT :" + quitmsg +"\r\n")
+			sys.exit()
+		else:
+			send_message(recipient, "You can't make me leave!")
+	
+	else:
+		default_message(recipient)
+>>>>>>> Stashed changes
 
 
 
@@ -1512,12 +1387,22 @@ def interp_message(message):
                 return
         games.append(HigherOrLowerGame(recipient))
 
+	twentyfour_triggers = ["!twentyfour", "!24"]
+	if command[0] in twentyfour_triggers:
+		# currently, game is independent
+		
+	onesixtythree_triggers = ["!onesixtythree", "!163"]
+	if command[0] in onesixtythree_triggers:
+		# currently, game is independent
+
     # RPN tool
     if command[0] == "!rpn":
-        if len(command) > 1:
-            rpncalc(command[1].split(" "), recipient)
-        else:
-            rpncalc([], recipient)
+		send_message(sender, "RPN calculator still in construction. Come back later.")
+		# currently ignored
+        # if len(command) > 1:
+            # rpncalc(command[1].split(" "), recipient)
+        # else:
+            # rpncalc([], recipient)
 
 
     # generic help trigger
@@ -1678,6 +1563,8 @@ while True:
 
     if donefirstloop == True:
         break
+
+irc.send ( "NICK " + nickname + "\r\n" )
 
 # join all active channels
 for channel in channels:

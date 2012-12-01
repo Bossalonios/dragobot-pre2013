@@ -1,3 +1,9 @@
 Hi, this is Dragobot. For a list of available triggers, type: !dragobot triggers
+<<<<<<< Updated upstream
 If you want to do something with me, type: !dragobot <command>, where <command> is one of the commands below.
 Available commands: about gamehelp help rpnhelp rpnexample quit triggers triggerhelp
+=======
+If you want to do something else with me, type: !dragobot <command>, where <command> is one of the commands below.
+Available commands: about gamehelp help quit triggers triggerhelp
+If you want me to send you PMs, send a PM to me first.
+>>>>>>> Stashed changes
