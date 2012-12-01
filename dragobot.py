@@ -1271,6 +1271,11 @@ def open_helpfile(recipient, helpfilename):
 	for line in helpfile:
 		send_message(recipient, line)
 
+def open_helpfile(recipient, helpfilename):
+	helpfile = open(helpfilename, "r")
+	for line in helpfile:
+		send_message(recipient, line)
+
 
 def parse_dragobot_command(message, sender, recipient):
 	
@@ -1563,6 +1568,8 @@ while True:
 
     if donefirstloop == True:
         break
+
+irc.send ( "NICK " + nickname + "\r\n" )
 
 irc.send ( "NICK " + nickname + "\r\n" )
 
