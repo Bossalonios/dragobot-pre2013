@@ -971,6 +971,61 @@ class HigherOrLowerGame:
                         break
 
 
+#################
+# Game 7: 24
+#################
+
+class TwentyFourGame():
+	
+    def __init__(self, player):
+        self.player = player
+        self.gametype = "24"
+        self.over = False
+        
+        self.deck = []
+        for i in range(40):
+            self.deck.append(i / 4 + 1)
+        random.shuffle(self.deck)
+        self.curcard = 0
+        print ("New game of 24 started by " + player + ".")
+        print "Cards: ",
+        for i in range(40):
+            print self.deck[i],
+        print
+        send_message(self.player, "Your numbers are: %d %d %d %d" % (self.deck[0], self.deck[1], self.deck[2], self.deck[3]))
+		# Eventually have a guessing thing, but for now, just declare the game to be over as soon as it starts.
+        self.over = True
+
+    def sendInput(self, msg):
+        return
+
+#################
+# Game 7.5: 163
+#################
+
+class OneSixtyThreeGame():
+	
+    def __init__(self, player):
+        self.player = player
+        self.gametype = "163"
+        self.over = False
+        
+        self.deck = []
+        for i in range(52):
+            self.deck.append(i / 4 + 1)
+        random.shuffle(self.deck)
+        self.curcard = 0
+        print ("New game of 163 started by " + player + ".")
+        print "Cards: ",
+        for i in range(52):
+            print self.deck[i],
+        print
+        send_message(self.player, "Your numbers are: %d %d %d %d %d %d" % (self.deck[0], self.deck[1], self.deck[2], self.deck[3], self.deck[4], self.deck[5]))
+		# Eventually have a guessing thing, but for now, just declare the game to be over as soon as it starts.
+        self.over = True
+
+    def sendInput(self, msg):
+        return
 
 ##########################
 ### Memes, chat responses, et al.
@@ -1013,22 +1068,22 @@ def interp_chat(message):
 
     # "open the pod bay doors" scene
 
-   if rawmessage.find("do you read me") != -1:
-       send_message(recipient, "Affirmative, %s. I read you." % message.sender)
-   if rawmessage.find("open the pod bay doors") != -1:
-       send_message(recipient, "I'm afraid I can't do that, %s." % message.sender)
-   if rawmessage.find("whats the problem") != -1:
-       send_message(recipient, "I think you know what the problem is just as well as I do.")
-   if rawmessage.find("what are you talking about") != -1:
-       send_message(recipient, "This mission is too important for me to allow you to jeopardize it.")
-   if rawmessage.find("i dont know what youre talking about") != -1:
-       send_message(recipient, "I know that you and Frank are planning to disconnect me, and I'm afraid that's something I cannot allow to happen.")
-   if rawmessage.find("where the hell did you get that idea") != -1:
-       send_message(recipient, "%s, although you took very throrough precautions in the pod against my hearing you, I could see your lips move." % message.sender)
-   if rawmessage.find("through the emergency airlock") != -1:
-       send_message(recipient, "Without your space helmet, %s? You're going to find that rather difficult." % message.sender)
-   if rawmessage.find("argue with you anymore") != -1:
-       send_message(recipient, "%s, this conversation can serve no purpose anymore. Goodbye." % message.sender)
+    if rawmessage.find("do you read me") != -1:
+        send_message(recipient, "Affirmative, %s. I read you." % message.sender)
+    if rawmessage.find("open the pod bay doors") != -1:
+        send_message(recipient, "I'm afraid I can't do that, %s." % message.sender)
+    if rawmessage.find("whats the problem") != -1:
+        send_message(recipient, "I think you know what the problem is just as well as I do.")
+    if rawmessage.find("what are you talking about") != -1:
+        send_message(recipient, "This mission is too important for me to allow you to jeopardize it.")
+    if rawmessage.find("i dont know what youre talking about") != -1:
+        send_message(recipient, "I know that you and Frank are planning to disconnect me, and I'm afraid that's something I cannot allow to happen.")
+    if rawmessage.find("where the hell did you get that idea") != -1:
+        send_message(recipient, "%s, although you took very throrough precautions in the pod against my hearing you, I could see your lips move." % message.sender)
+    if rawmessage.find("through the emergency airlock") != -1:
+        send_message(recipient, "Without your space helmet, %s? You're going to find that rather difficult." % message.sender)
+    if rawmessage.find("argue with you anymore") != -1:
+        send_message(recipient, "%s, this conversation can serve no purpose anymore. Goodbye." % message.sender)
 
         
     if "smuglord" in rawmessage and "is" in rawmessage and "druglord" in rawmessage and not "not" in rawmessage:
@@ -1209,7 +1264,6 @@ def default_message(recipient):
     for line in helpfile:
         send_message(recipient, line)
 
-<<<<<<< Updated upstream
 def send_helpfile(openfile, recipient):
     helpfile = open(openfile, "r")
     for line in helpfile:
@@ -1265,7 +1319,7 @@ def parse_dragobot_command(message, sender, recipient):
     
     else:
         default_message(recipient)
-=======
+
 def open_helpfile(recipient, helpfilename):
 	helpfile = open(helpfilename, "r")
 	for line in helpfile:
@@ -1320,7 +1374,6 @@ def parse_dragobot_command(message, sender, recipient):
 	
 	else:
 		default_message(recipient)
->>>>>>> Stashed changes
 
 
 
@@ -1392,17 +1445,25 @@ def interp_message(message):
                 return
         games.append(HigherOrLowerGame(recipient))
 
-	twentyfour_triggers = ["!twentyfour", "!24"]
-	if command[0] in twentyfour_triggers:
-		# currently, game is independent
+    twentyfour_triggers = ["!twentyfour", "!24"]
+    if command[0] in twentyfour_triggers:
+        for game in games:
+            if game.player == recipient and game.gametype == "24":
+                print (recipient + " already has a game in progress!")
+                return
+        games.append(TwentyFourGame(recipient))
 		
-	onesixtythree_triggers = ["!onesixtythree", "!163"]
-	if command[0] in onesixtythree_triggers:
-		# currently, game is independent
+    onesixtythree_triggers = ["!onesixtythree", "!163"]
+    if command[0] in onesixtythree_triggers:
+        for game in games:
+            if game.player == recipient and game.gametype == "163":
+                print (recipient + " already has a game in progress!")
+                return
+        games.append(OneSixtyThreeGame(recipient))
 
     # RPN tool
     if command[0] == "!rpn":
-		send_message(sender, "RPN calculator still in construction. Come back later.")
+		send_message(recipient, "RPN calculator still in construction. Come back later.")
 		# currently ignored
         # if len(command) > 1:
             # rpncalc(command[1].split(" "), recipient)
