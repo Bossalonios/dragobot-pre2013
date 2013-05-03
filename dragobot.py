@@ -545,18 +545,32 @@ def pokemongrade(time, hints):
 
     return grade
     
-# Don't repeat the last (n) Pokémon.
-REPEATLIMIT = 50
+# Don't  the last (n) Pokémon.
+REPEATLIMIT = 
 
 class PokemonGame:
     
-    def __init__(self, player):
-
-        global repeats
+    def __init__(self, player, rounds = 1):
 
         self.player = player
         self.gametype = "pokemon"
         self.over = False
+
+        self.thepokemon = ""
+        self.theword = ""
+        self.hintmask = ""
+        self.totalhints = 0
+
+        self.rounds = rounds
+        if(rounds > 1):
+            send_message(player, "Starting a game of Name That Pokémon with %d rounds." % (rounds))
+
+        print ("New game of Name That Pokémon started by " + player + " - Word: " + self.thewordd)
+        self.startGame(player)
+
+    def startGame(self, player):
+
+        global repeats
 
         # repeat avoidance code.
         pokemon = pokemonlist[randint(0, 648)]
@@ -571,7 +585,6 @@ class PokemonGame:
         self.hintmask = ["_"] * len(pokemon.name)
         self.totalhints = 0
         
-        print ("New game of Name That Pokémon started by " + player + " - Word: " + self.theword)
         send_message(player, "This Pokémon's dex entry is: %s" % (pokemonflavortexts[pokemon.ID - 1 + 649 * randint(0, 1)]))
         # start the timer _after_ the message has been sent.
         self.starttime = timer()
@@ -585,11 +598,16 @@ class PokemonGame:
                 # they got it
                 finishtime = timer()
                 finalgrade = pokemongrade(finishtime - self.elapstimestart, self.totalhints)
-
-                send_message(self.player, "You got it, %s! The Pokémon's name was %s." % (msg.sender, self.theword))
+                
+                send_message(self.player, "You got it, %s! The Pokémon's name was %s.%s" % (msg.sender, self.theword, ((" (%d rounds to go)" % (self.rounds - 1)) if (self.rounds > 1) else "")))
                 grade = lettergrade(finalgrade)  # the letter grade itself, and the flavour text
                 send_message(self.player, "Your rank: %s (%s) - %s" % (grade[0], "%.2f%%" % finalgrade, grade[1]))
-                self.over = True
+                
+                self.rounds -= 1
+                if self.rounds <= 0:
+                    self.over = True
+                else:
+                    self.startGame(self.player)
 
             elif msg.message.lower() == "!pokemonhint" or msg.message.lower() == "!ph":
                 
@@ -642,6 +660,8 @@ class PokemonGame:
                     self.totalhints = 3
                     send_message(self.player, "I can't give any more hints!")
                     
+
+
 
 
 #############
@@ -1346,6 +1366,52 @@ def open_helpfile(recipient, helpfilename):
     for line in helpfile:
         send_message(recipient, line)
 
+def parse_dragobot_command(message, sender, recipient):
+    
+    splitmsg1 = message.strip().split(" ", 1)
+    command = splitmsg1[0]
+
+    if command == "about":
+        send_message(recipient, "Dragobot v.%s (last compiled: %s)" % (version, buildtime))
+        send_message(recipient, "Dragobot, a Python IRC bot that plays games")
+        send_message(recipient, "© 2012 Joe Zeng, all rights reserved. http://joezeng.com/")
+
+    elif command == "gamehelp":
+        if len(splitmsg1) == 1:
+            open_helpfile(recipient, "data/help/gamehelp.txt")
+        else:
+        # help for games
+            param = splitmsg1[1].strip("!")
+            if param == "mastermind" or \
+            param == "dealornodeal" or \
+            param == "namethatpokemon" or \
+            param == "hangman" or \
+            param == "higherorlower":
+                open_helpfile(recipient, "data/help/gamehelp_%s.txt" % param)
+
+    elif command == "help":
+        open_helpfile(recipient, "data/help/help.txt")
+    
+    elif command == "triggers":
+        if len(splitmsg1) == 1:
+            open_helpfile(recipient, "data/help/triggers.txt")
+        
+    elif command == "triggerhelp":
+        open_helpfile(recipient, "data/help/triggerhelp.txt")
+
+    elif command == "quit":
+        if sender == "Dragonaire":
+            # quit completely
+            irc.send ( "QUIT :" + quitmsg +"\r\n")
+            sys.exit()
+        else:
+            send_message(recipient, "You can't make me leave!")
+    
+    else:
+        default_message(recipient)
+
+
+
 
 
 ###########################
@@ -1393,9 +1459,18 @@ def interp_message(message):
     if command[0] in namethatpokemon_triggers:
         for game in games:
             if game.player == recipient and game.gametype == "pokemon":
-                print (recipient + " already has a game in progress!")
+                if(len(command) > 1):
+                    if(command[1] == "stop"):
+                        game.over = True
+                        send_message(recipient, "Game of Name That Pokémon stopped.")
+                else:
+                    print (recipient + " already has a game in progress!")
                 return
-        games.append(PokemonGame(recipient))
+        if(len(command) > 1):
+            if(command[1].isdigit()):
+                games.append(PokemonGame(recipient, int(command[1])))
+        else:
+            games.append(PokemonGame(recipient))
         return
     
     dealornodeal_triggers = ["!dealornodeal", "!dond"]
