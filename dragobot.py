@@ -565,7 +565,7 @@ class PokemonGame:
         if(rounds > 1):
             send_message(player, "Starting a game of Name That Pokémon with %d rounds." % (rounds))
 
-        print ("New game of Name That Pokémon started by " + player + " - Word: " + self.thewordd)
+        print ("New game of Name That Pokémon started by " + player + " - Word: " + self.theword)
         self.startGame(player)
 
     def startGame(self, player):
