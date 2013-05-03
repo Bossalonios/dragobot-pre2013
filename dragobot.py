@@ -1,4 +1,4 @@
-# Dragobot is (c) 2012 Joe Zeng.
+# Dragobot is (c) 2012-2013 Joe Zeng.
 # coding: UTF-8 #
 # This code is released under the MIT license.
 
@@ -546,7 +546,7 @@ def pokemongrade(time, hints):
     return grade
     
 # Don't  the last (n) Pokémon.
-REPEATLIMIT = 
+REPEATLIMIT = 50
 
 class PokemonGame:
     
