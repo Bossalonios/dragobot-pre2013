@@ -1,2 +1,2 @@
 In order to enter a guess, simply type the name of the Pokémon you are guessing. Be sure to spell it correctly.
-For hints, type: !pokemonhint or !ph
+For hints, type: !pokemonhint or !ph (Using a hint takes away 20 points from your score!)

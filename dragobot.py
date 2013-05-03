@@ -14,6 +14,9 @@ import string
 import math
 from random import randint
 
+import rpn
+from rpn import RPN
+
 # Basic bot info
 
 irc = socket.socket ( socket.AF_INET, socket.SOCK_STREAM )
@@ -25,6 +28,7 @@ nickname = basenick
 
 username = "dragobot"
 realname = "Dragobot"
+operatorname = "Dragonaire"
 
 quitmsg = "Goodbye."
 
@@ -976,7 +980,7 @@ class HigherOrLowerGame:
 #################
 
 class TwentyFourGame():
-	
+    
     def __init__(self, player):
         self.player = player
         self.gametype = "24"
@@ -993,18 +997,19 @@ class TwentyFourGame():
             print self.deck[i],
         print
         send_message(self.player, "Your numbers are: %d %d %d %d" % (self.deck[0], self.deck[1], self.deck[2], self.deck[3]))
-		# Eventually have a guessing thing, but for now, just declare the game to be over as soon as it starts.
+        # Eventually have a guessing thing, but for now, just declare the game to be over as soon as it starts.
         self.over = True
 
     def sendInput(self, msg):
         return
 
+        
 #################
 # Game 7.5: 163
 #################
 
 class OneSixtyThreeGame():
-	
+    
     def __init__(self, player):
         self.player = player
         self.gametype = "163"
@@ -1021,12 +1026,23 @@ class OneSixtyThreeGame():
             print self.deck[i],
         print
         send_message(self.player, "Your numbers are: %d %d %d %d %d %d" % (self.deck[0], self.deck[1], self.deck[2], self.deck[3], self.deck[4], self.deck[5]))
-		# Eventually have a guessing thing, but for now, just declare the game to be over as soon as it starts.
+        # Eventually have a guessing thing, but for now, just declare the game to be over as soon as it starts.
         self.over = True
 
     def sendInput(self, msg):
         return
 
+        
+        
+        
+######################
+### RPN calculator
+######################
+        
+_rpn = RPN()
+        
+        
+        
 ##########################
 ### Memes, chat responses, et al.
 ##########################
@@ -1277,7 +1293,7 @@ def parse_dragobot_command(message, sender, recipient):
     if command == "about":
         send_message(recipient, "Dragobot v.%s (last compiled: %s)" % (version, buildtime))
         send_message(recipient, "Dragobot, a Python IRC bot that plays games")
-        send_message(recipient, "© 2012 Joe Zeng, all rights reserved. http://joezeng.com/")
+        send_message(recipient, "© 2012-2013 Joe Zeng, all rights reserved. http://joezeng.com/")
 
     elif command == "gamehelp":
         if len(splitmsg1) == 1:
@@ -1310,7 +1326,7 @@ def parse_dragobot_command(message, sender, recipient):
         send_helpfile("data/help/rpnexample.txt", recipient)
 
     elif command == "quit":
-        if sender == "Dragonaire":
+        if sender == operatorname:
             # quit completely
             irc.send ( "QUIT :" + quitmsg +"\r\n")
             sys.exit()
@@ -1321,61 +1337,14 @@ def parse_dragobot_command(message, sender, recipient):
         default_message(recipient)
 
 def open_helpfile(recipient, helpfilename):
-	helpfile = open(helpfilename, "r")
-	for line in helpfile:
-		send_message(recipient, line)
+    helpfile = open(helpfilename, "r")
+    for line in helpfile:
+        send_message(recipient, line)
 
 def open_helpfile(recipient, helpfilename):
-	helpfile = open(helpfilename, "r")
-	for line in helpfile:
-		send_message(recipient, line)
-
-
-def parse_dragobot_command(message, sender, recipient):
-	
-	splitmsg1 = message.strip().split(" ", 1)
-	command = splitmsg1[0]
-
-	if command == "about":
-		send_message(recipient, "Dragobot v.%s (last compiled: %s)" % (version, buildtime))
-		send_message(recipient, "Dragobot, a Python IRC bot that plays games")
-		send_message(recipient, "© 2012 Joe Zeng, all rights reserved. http://joezeng.com/")
-
-	elif command == "gamehelp":
-		if len(splitmsg1) == 1:
-			open_helpfile(recipient, "data/help/gamehelp.txt")
-		else:
-		# help for games
-			param = splitmsg1[1].strip("!")
-			if param == "mastermind" or \
-			param == "dealornodeal" or \
-			param == "namethatpokemon" or \
-			param == "hangman" or \
-			param == "higherorlower":
-				open_helpfile(recipient, "data/help/gamehelp_%s.txt" % param)
-
-	elif command == "help":
-		open_helpfile(recipient, "data/help/help.txt")
-	
-	elif command == "triggers":
-		if len(splitmsg1) == 1:
-			open_helpfile(recipient, "data/help/triggers.txt")
-		
-	elif command == "triggerhelp":
-		open_helpfile(recipient, "data/help/triggerhelp.txt")
-
-	elif command == "quit":
-		if sender == "Dragonaire":
-			# quit completely
-			irc.send ( "QUIT :" + quitmsg +"\r\n")
-			sys.exit()
-		else:
-			send_message(recipient, "You can't make me leave!")
-	
-	else:
-		default_message(recipient)
-
-
+    helpfile = open(helpfilename, "r")
+    for line in helpfile:
+        send_message(recipient, line)
 
 
 
@@ -1452,7 +1421,7 @@ def interp_message(message):
                 print (recipient + " already has a game in progress!")
                 return
         games.append(TwentyFourGame(recipient))
-		
+        
     onesixtythree_triggers = ["!onesixtythree", "!163"]
     if command[0] in onesixtythree_triggers:
         for game in games:
@@ -1463,12 +1432,19 @@ def interp_message(message):
 
     # RPN tool
     if command[0] == "!rpn":
-		send_message(recipient, "RPN calculator still in construction. Come back later.")
-		# currently ignored
-        # if len(command) > 1:
-            # rpncalc(command[1].split(" "), recipient)
-        # else:
-            # rpncalc([], recipient)
+        # send_message(recipient, "RPN calculator still in construction. Come back later.")
+        if len(command) > 1:
+            _rpn.rpncalc(command[1].split(" "))
+            if(_rpn.message != ""):
+                send_message(recipient, _rpn.message)
+            else:
+                send_message(recipient, "Result: " + _rpn.get_stacktop())
+        else:
+            _rpn.rpncalc([])
+            if(_rpn.message != ""):
+                send_message(recipient, _rpn.message)
+            else:
+                send_message(recipient, "Result: " + _rpn.get_stacktop())
 
 
     # generic help trigger
