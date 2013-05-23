@@ -215,7 +215,7 @@ def list_users(channel):
 
 def lettergrade(grade):
     if grade >= 100:
-        return ["SSS", " Perfect!"]
+        return ["SSS", "Perfect!"]
     if grade >= 95:
         return ["SS", "Awesome!"]
     if grade >= 90:
@@ -456,6 +456,10 @@ class HangmanGame:
         if (msg.receiver == self.player and self.player[0] == "#" or msg.sender == self.player):
 
             inputs = msg.message
+            
+            if len(inputs) == 1:
+                guess = inputs[0]
+                self.guessLetter(guess)
 
             if inputs[:8] == "!letter ":
                 if len(inputs) < 9:
@@ -476,6 +480,29 @@ class HangmanGame:
                     return
                 guess = inputs[7]
                 self.guessLetter(guess)
+
+            elif inputs[:2] == "! ":
+                if inputs[2:].upper() == self.theword.upper():
+                    # the word has been guessed.
+                    send_message(self.player, "You got it. The answer was: %s" % (self.theword))
+                    
+                    finalgrade = hangmangrade(timer() - self.starttime, self.theword, self.guessmask, self.wrongguesses, self.maxwrongguesses, True)
+                    grade = lettergrade(finalgrade)  # the letter grade itself, and the flavour text
+                    send_message(self.player, "Your rank: %s - %s" % (grade[0], grade[1]))
+                    
+                    self.over = True
+                else:
+                    send_message(self.player, "No, not quite.")
+                    self.wrongguesses += 1
+                    send_message(self.player, "Wrong guesses left: %s" % (self.maxwrongguesses - self.wrongguesses))
+                    if self.wrongguesses >= self.maxwrongguesses:
+                        send_message(self.player, "Game over! The answer was: %s" % (self.theword))
+                        
+                        finalgrade = hangmangrade(timer() - self.starttime, self.theword, self.guessmask, self.wrongguesses, self.maxwrongguesses, False)
+                        grade = lettergrade(finalgrade)  # the letter grade itself, and the flavour text
+                        send_message(self.player, "Your rank: %s - %s" % (grade[0], grade[1]))
+                        
+                        self.over = True
                 
             elif inputs[:7] == "!solve ":
                 if inputs[7:].upper() == self.theword.upper():
@@ -500,12 +527,12 @@ class HangmanGame:
                         
                         self.over = True
 
-            elif inputs[:15] == "!guessedletters":
+            elif inputs == "!guessedletters" or inputs == "!guesses" or inputs == "!g":
                 list.sort(self.guessedletters)
                 outputstring = ""
                 for a in self.guessedletters:
                     outputstring += a + " "
-                send_message(self.player, "You've guessed: " + outputstring)
+                send_message(self.player, "You've guessed: " + outputstring + (" (%d wrong guesses left)" % (self.maxwrongguesses - self.wrongguesses)))
 
 
 ###############
@@ -781,9 +808,7 @@ class DealOrNoDealGame:
 
     def make_a_deal(self):
         self.dealing = True
-
         self.deal = self.calc_deal_amt()
-        
         send_message(self.player, "The banker is willing to offer you $%.02f. !deal or !nodeal?" % self.deal)
 
     def print_remaining_cases(self):
@@ -956,7 +981,7 @@ class HigherOrLowerGame:
     def sendInput(self, msg):
         if (msg.receiver == self.player and self.player[0] == "#" or msg.sender == self.player):
             
-            if msg.message == "!higher":
+            if msg.message == "!higher" or msg.message == "!h":
                 while True:   # stupid lack of gotos in Python.
                     self.curcard += 1
                     send_message(self.player, "Your next card is a%s %s." % ("n" if self.deck[self.curcard] == 12 or self.deck[self.curcard] == 6 else "", cardvalues[self.deck[self.curcard]]))
@@ -975,7 +1000,7 @@ class HigherOrLowerGame:
                     else:
                         break
 
-            elif msg.message == "!lower":
+            elif msg.message == "!lower" or msg.message == "!l":
                 while True:   # stupid lack of gotos in Python.
                     self.curcard += 1
                     send_message(self.player, "Your next card is a%s %s." % ("n" if self.deck[self.curcard] == 12 else "", cardvalues[self.deck[self.curcard]]))
@@ -1134,6 +1159,15 @@ fuzzydegree = 5 # can only be 5 or 15
 # CTCP commands
 ################
 
+daytimewords = [" in the morning", "noon", " in the afternoon", " in the evening", " at night", "midnight"]
+numberwords = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven"]
+    # don't use twelve, just say "noon" or "midnight"
+
+timewords = ["%s o'clock", "quarter past %s", "half past %s", "quarter to %s"]
+fivewords = ["%s o'clock", "five past %s", "ten past %s", "quarter past %s", "twenty past %s", "twenty-five past %s", "half past %s", "twenty-five to %s", "twenty to %s", "quarter to %s", "ten to %s", "five to %s"]
+
+approxwords = ["a bit before", "about", "a little after"]
+
 def interp_ctcp(sender, message):
 
     # if the message is a CTCP ping
@@ -1147,15 +1181,6 @@ def interp_ctcp(sender, message):
         send_notice(sender, "\x01VERSION Dragobot v.%s / Python 2.7.3\x01\r\n" % version)
     
     # CTCP TIME pranks.
-
-    daytimewords = [" in the morning", "noon", " in the afternoon", " in the evening", " at night", "midnight"]
-    numberwords = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven"]
-        # don't use twelve, just say "noon" or "midnight"
-    
-    timewords = ["%s o'clock", "quarter past %s", "half past %s", "quarter to %s"]
-    fivewords = ["%s o'clock", "five past %s", "ten past %s", "quarter past %s", "twenty past %s", "twenty-five past %s", "half past %s", "twenty-five to %s", "twenty to %s", "quarter to %s", "ten to %s", "five to %s"]
-
-    approxwords = ["a bit before", "about", "a little after"]
 
     if message == "TIME":
         thetime = int((timer() * 1000000) * (16 ** 8) / 86400000000) % (16 ** 8)
@@ -1459,15 +1484,13 @@ def interp_message(message):
     if command[0] in namethatpokemon_triggers:
         for game in games:
             if game.player == recipient and game.gametype == "pokemon":
-                if(len(command) > 1):
-                    if(command[1] == "stop"):
-                        game.over = True
-                        send_message(recipient, "Game of Name That Pokémon stopped.")
+                if(len(command) > 1 and command[1] == "stop"):
+                    game.over = True
+                    send_message(recipient, "Game of Name That Pokémon stopped.")
                 else:
                     print (recipient + " already has a game in progress!")
                 return
-        if(len(command) > 1):
-            if(command[1].isdigit()):
+        if(len(command) > 1 and command[1].isdigit()):
                 games.append(PokemonGame(recipient, int(command[1])))
         else:
             games.append(PokemonGame(recipient))
