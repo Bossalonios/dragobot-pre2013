@@ -1,1 +1,0 @@
-Available ctcp commands: time version ping help localtime thetime theactualtime

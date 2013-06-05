@@ -1,4 +1,4 @@
-Syntax: !rpn <number | operator | reset>*
+Syntax: !rpn <number | operator | reset> *
 Currently allowed operators: + - * / mod sqrt AC C
 Typing in "reset" or "AC" anywhere will clear the stack. Typing in "cancel", "C", or "CE" will clear the last number off the top of the stack.
 Typing in a command with a number at the end will display that number at the end of the stack after performing all the requested operations.

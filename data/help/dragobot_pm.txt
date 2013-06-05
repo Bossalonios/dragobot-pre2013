@@ -1,0 +1,2 @@
+Hi, this is Dragobot. For a list of available triggers, type: !dragobot triggers
+If you want to do something else with me, type: !dragobot <command>, where <command> is one of the commands below.

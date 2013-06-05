@@ -1334,12 +1334,17 @@ def interp_ctcp(sender, message):
 	if message == "CLIENTINFO":
 		# List all possible CTCP commands.
 		send_notice(sender, "CLIENTINFO FINGER HELP PING SOURCE TIME USERINFO VERSION")
+	
+
+
+
+
+
+
 
 ################
 # Commands for dragobot
 ################
-
-
 
 # help message
 
@@ -1363,6 +1368,9 @@ def parse_dragobot_command(message, sender, recipient):
 		send_message(recipient, "Dragobot, a Python IRC bot that plays games")
 		send_message(recipient, "© 2012-2013 Joe Zeng, all rights reserved. http://joezeng.com/")
 
+	elif command == "help":
+		send_helpfile("data/help/help.txt", recipient)
+	
 	elif command == "gamehelp":
 		if len(splitmsg1) == 1:
 			helpfile = open("data/help/gamehelp.txt", "r")
@@ -1376,10 +1384,10 @@ def parse_dragobot_command(message, sender, recipient):
 			param == "namethatpokemon" or \
 			param == "hangman" or \
 			param == "higherorlower":
-				send_helpfile("data/help/gamehelp_%s.txt" % param, recipient)
+				send_helpfile("data/help/gamehelp/%s.txt" % param, recipient)
 
-	elif command == "help":
-		send_helpfile("data/help/help.txt", recipient)
+	elif command == "commands":
+		send_helpfile("data/help/commands.txt", recipient)
 	
 	elif command == "triggers":
 		send_helpfile("data/help/triggers.txt", recipient)
@@ -1395,60 +1403,6 @@ def parse_dragobot_command(message, sender, recipient):
 
 	elif command == "quit":
 		if sender == operatorname:
-			# quit completely
-			irc.send ( "QUIT :" + quitmsg +"\r\n")
-			sys.exit()
-		else:
-			send_message(recipient, "You can't make me leave!")
-	
-	else:
-		default_message(recipient)
-
-def open_helpfile(recipient, helpfilename):
-	helpfile = open(helpfilename, "r")
-	for line in helpfile:
-		send_message(recipient, line)
-
-def open_helpfile(recipient, helpfilename):
-	helpfile = open(helpfilename, "r")
-	for line in helpfile:
-		send_message(recipient, line)
-
-def parse_dragobot_command(message, sender, recipient):
-	
-	splitmsg1 = message.strip().split(" ", 1)
-	command = splitmsg1[0]
-
-	if command == "about":
-		send_message(recipient, "Dragobot v.%s (last compiled: %s)" % (version, buildtime))
-		send_message(recipient, "Dragobot, a Python IRC bot that plays games")
-		send_message(recipient, "© 2012 Joe Zeng, all rights reserved. http://joezeng.com/")
-
-	elif command == "gamehelp":
-		if len(splitmsg1) == 1:
-			open_helpfile(recipient, "data/help/gamehelp.txt")
-		else:
-		# help for games
-			param = splitmsg1[1].strip("!")
-			if param == "mastermind" or \
-			param == "dealornodeal" or \
-			param == "namethatpokemon" or \
-			param == "hangman" or \
-			param == "higherorlower":
-				open_helpfile(recipient, "data/help/gamehelp_%s.txt" % param)
-
-	elif command == "help":
-		open_helpfile(recipient, "data/help/help.txt")
-	
-	elif command == "triggers":
-		if len(splitmsg1) == 1:
-			open_helpfile(recipient, "data/help/triggers.txt")
-		
-	elif command == "triggerhelp":
-		open_helpfile(recipient, "data/help/triggerhelp.txt")
-
-	elif command == "quit":
-		if sender == "Dragonaire":
 			# quit completely
 			irc.send ( "QUIT :" + quitmsg +"\r\n")
 			sys.exit()
