@@ -933,7 +933,28 @@ class DealOrNoDealGame:
 # Game 5: Trivia
 ###############
 
+trivia_maxhints = 7
+
 trivialist = []
+
+def triviagrade(time, hints):
+	grade = 100
+
+	perftime = 10
+	failtime = 120
+
+	grade -= logint( max(float(time - perftime), 0) / float(failtime - perftime) ) * 50
+
+	# -10 points per hint
+	grade -= hints * 10
+
+	print "Hints used: %s/3" % (hints)
+	print "Time taken: %s seconds" % (time)
+	print "Final grade: %s%%" % (grade)
+
+	return grade
+
+
 
 class TriviaQuestion:
 
@@ -951,28 +972,65 @@ class TriviaGame:
 		self.over = False
 		
 		self.rounds = rounds
+		self.playedrounds = 0
+		self.roundstarttime = timer()
+
+		self.hintmask = []
+		self.hintanswer = ""
+		self.hintsused = 0
+
 		self.startGame()
 	
 	def startGame(self):
 		
 		global trivialist
-		self.rounds -= 1
+		self.playedrounds += 1
+		self.hintsused = 0
+		self.roundstarttime = timer()
 		
 		self.question = random.choice(trivialist)
+		self.hintanswer = self.question.answers[0] # always use the first answer as the answer for giving hints
+		self.hintmask = []
+		for a in self.hintanswer:
+			if a in alphanumstring:
+				self.hintmask.append("_")
+			else:
+				self.hintmask.append(a)
 		
 		print ("New game of trivia started by " + self.player + ".")
-		send_message(self.player, self.question.question)
+		send_message(self.player, "Q. %d of %d: %s" % (self.playedrounds, self.rounds, self.question.question))
 	
 	def sendInput(self, msg):
 		
+		global trivia_maxhints
+
 		if msg.message in self.question.answers:
-			send_message(self.player, "Correct!")
-			self.over = True
+
+			# they got it
+			finishtime = timer()
+			finalgrade = triviagrade(finishtime - self.roundstarttime, self.hintsused)
+
+			send_message(self.player, "Correct, %s! Your rank: %s" % (msg.sender, lettergrade(finalgrade)[0]))
+			if self.playedrounds < self.rounds:
+				self.startGame()
+			else:
+				self.over = True
+
+		if msg.message == "!hint" or msg.message == "!h":
+			if self.hintsused >= trivia_maxhints:
+				send_message(self.player, "I can't give any more hints! Type !giveup to give up.")
+			else:
+				# send a hint
+				self.hintsused += 1
+				if(self.hintsused > 1):
+					for a in range((len(self.hintmask) * (self.hintsused - 1) / trivia_maxhints) - (len(self.hintmask) * (self.hintsused - 2) / trivia_maxhints)):
+						char = randint(0, len(self.hintmask) - 1)
+						while self.hintmask[char] != "_":
+							char = randint(0, len(self.hintanswer) - 1)
+						self.hintmask[char] = self.hintanswer[char]
+				send_message(self.player, "Here's a hint: " + "".join(self.hintmask))
+			
 		
-
-
-
-
 
 
 #################
@@ -1468,7 +1526,7 @@ def interp_message(message):
 					print (recipient + " already has a game in progress!")
 				return
 		if(len(command) > 1 and command[1].isdigit()):
-				games.append(NameThatPokemonGame(recipient, int(command[1])))
+			games.append(NameThatPokemonGame(recipient, int(command[1])))
 		else:
 			games.append(NameThatPokemonGame(recipient))
 		return
@@ -1487,7 +1545,11 @@ def interp_message(message):
 			if game.player == recipient and game.gametype == "trivia":
 				print (recipient + " already has a game in progress!")
 				return
-		games.append(TriviaGame(recipient))
+		if(len(command) > 1 and command[1].isdigit()):
+			games.append(TriviaGame(recipient, int(command[1])))
+		else:
+			games.append(TriviaGame(recipient))
+		return
 
 	higherorlower_triggers = ["!higherorlower", "!hol"]
 	if command[0] in higherorlower_triggers:
