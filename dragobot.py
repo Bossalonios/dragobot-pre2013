@@ -978,6 +978,8 @@ class TriviaQuestion:
 	def __init__(self, question, answerstring):
 		self.question = question
 		self.answers = answerstring.split("|")
+		for answer in self.answers:
+			answer = answer.lower()
 
 class TriviaGame:
 
@@ -1027,7 +1029,7 @@ class TriviaGame:
 	
 	def sendInput(self, msg):
 
-		if msg.message in self.question.answers:
+		if msg.message.lower() in self.question.answers:
 
 			# they got it
 			finishtime = timer()
