@@ -11,6 +11,8 @@ import random
 import os.path
 import string
 
+from threading import Timer
+
 import math
 from random import randint
 
@@ -937,20 +939,20 @@ trivia_maxhints = 7
 
 trivialist = []
 
-def triviagrade(time, hints):
+def triviagrade(time, hints, answer):
+
+	time = max(time, hints * 20);
+
 	grade = 100
 
-	perftime = 10
-	failtime = 120
+	perftime = 5 + len(answer) * 0.2 # assume 60 wpm typing
+	failtime = 120 + len(answer) * 0.2
 
 	grade -= logint( max(float(time - perftime), 0) / float(failtime - perftime) ) * 50
 
-	# -10 points per hint
-	grade -= hints * 10
-
-	print "Hints used: %s/3" % (hints)
-	print "Time taken: %s seconds" % (time)
-	print "Final grade: %s%%" % (grade)
+	print "Hints used: %d/%d" % (hints, trivia_maxhints)
+	print "Time taken: %d seconds" % (time)
+	print "Final grade: %f%%" % (grade)
 
 	return grade
 
@@ -978,8 +980,10 @@ class TriviaGame:
 		self.hintmask = []
 		self.hintanswer = ""
 		self.hintsused = 0
+		self.hint_timers = []
 
 		self.startGame()
+		print ("New game of trivia started by " + self.player + ".")
 	
 	def startGame(self):
 		
@@ -997,40 +1001,63 @@ class TriviaGame:
 			else:
 				self.hintmask.append(a)
 		
-		print ("New game of trivia started by " + self.player + ".")
 		send_message(self.player, "Q. %d of %d: %s" % (self.playedrounds, self.rounds, self.question.question))
+
+		self.hint_timers = []
+		for a in range(1, 7):
+			self.hint_timers.append(Timer(a*20, self.giveHint, ()))
+			self.hint_timers[a-1].start()
 	
 	def sendInput(self, msg):
-		
-		global trivia_maxhints
 
 		if msg.message in self.question.answers:
 
 			# they got it
 			finishtime = timer()
-			finalgrade = triviagrade(finishtime - self.roundstarttime, self.hintsused)
+			finalgrade = triviagrade(finishtime - self.roundstarttime, self.hintsused, msg.message)
 
 			send_message(self.player, "Correct, %s! Your rank: %s" % (msg.sender, lettergrade(finalgrade)[0]))
+			self.stop_timers()
 			if self.playedrounds < self.rounds:
 				self.startGame()
 			else:
 				self.over = True
 
 		if msg.message == "!hint" or msg.message == "!h":
-			if self.hintsused >= trivia_maxhints:
-				send_message(self.player, "I can't give any more hints! Type !giveup to give up.")
-			else:
-				# send a hint
-				self.hintsused += 1
-				if(self.hintsused > 1):
-					for a in range((len(self.hintmask) * (self.hintsused - 1) / trivia_maxhints) - (len(self.hintmask) * (self.hintsused - 2) / trivia_maxhints)):
-						char = randint(0, len(self.hintmask) - 1)
-						while self.hintmask[char] != "_":
-							char = randint(0, len(self.hintanswer) - 1)
-						self.hintmask[char] = self.hintanswer[char]
-				send_message(self.player, "Here's a hint: " + "".join(self.hintmask))
+			self.giveHint("user")
 			
-		
+		if msg.message == "!giveup" or msg.message == "!gu":
+			send_message(self.player, "Oh, too bad! The answer was: %s" % (self.question.answers[0]))
+			self.stop_timers()
+			if self.playedrounds < self.rounds:
+				self.startGame()
+			else:
+				self.over = True
+	
+	def giveHint(self, arg=""):
+		global trivia_maxhints
+		if arg == "user" and self.hintsused >= trivia_maxhints:
+			send_message(self.player, "I can't give any more hints! Type !giveup to give up.")
+		elif self.hintsused >= trivia_maxhints:
+			return # Don't return the "I can't give any more hints" message on automated hints.
+		else:
+			# send a hint
+			self.hintsused += 1
+			if(arg == "user"):
+				self.hint_timers[self.hintsused - 1].cancel()
+			if(self.hintsused > 1):
+				for a in range((len(self.hintmask) * (self.hintsused - 1) / trivia_maxhints) - (len(self.hintmask) * (self.hintsused - 2) / trivia_maxhints)):
+					char = randint(0, len(self.hintmask) - 1)
+					while self.hintmask[char] != "_":
+						char = randint(0, len(self.hintanswer) - 1)
+					self.hintmask[char] = self.hintanswer[char]
+			send_message(self.player, "Here's a hint: " + "".join(self.hintmask))
+	
+	def stop_timers(self):
+		# cancel all the remaining hint timers
+		for a in range(1, 7):
+			self.hint_timers[a-1].cancel()
+
 
 
 #################
