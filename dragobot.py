@@ -1044,7 +1044,7 @@ class TriviaGame:
 			self.giveHint("user")
 			
 		if msg.message == "!giveup" or msg.message == "!gu":
-			send_message(self.player, "Oh, too bad! The answer was: %s   Your rank: FF (0.00%)" % (self.question.answers[0]))
+			send_message(self.player, "Oh, too bad! The answer was: %s   Your rank: FF (0.00%%)" % (self.question.answers[0]))
 			self.stop_timers()
 			if self.playedrounds < self.rounds:
 				self.startGame()
@@ -1052,7 +1052,7 @@ class TriviaGame:
 				self.over = True
 	
 	def timeUp(self):
-		send_message(self.player, "Time's up! The answer was: %s   Your rank: FF (0.00%)" % (self.question.answers[0]))
+		send_message(self.player, "Time's up! The answer was: %s   Your rank: FF (0.00%%)" % (self.question.answers[0]))
 		self.stop_timers()
 		if self.playedrounds < self.rounds:
 			self.startGame()
