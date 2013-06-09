@@ -5,4 +5,8 @@ How many days are there in a year on Mars?
 What does the Roman acronym "S.P.Q.R." stand for?
 senatus populusque romanus
 In Dan Brown's book, "Angels and Demons", what did Vittoria do that constantly offended the Vatican population?
-wear shorts
+wear shorts|wore shorts
+What is the longest word for a number in English in which every letter is different?
+five thousand
+Before Toronto became the largest city in Canada, what was the largest city?
+Montreal|Montréal

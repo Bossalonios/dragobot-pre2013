@@ -1,0 +1,6 @@
+The format for a trivia question is very simple:
+
+Line 1: question
+Line 2: answers, separated by |
+
+Do this for every question.
