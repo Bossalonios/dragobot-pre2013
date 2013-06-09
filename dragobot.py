@@ -977,9 +977,7 @@ class TriviaQuestion:
 
 	def __init__(self, question, answerstring):
 		self.question = question
-		self.answers = answerstring.split("|")
-		for answer in self.answers:
-			answer = answer.lower()
+		self.answers = [answer.lower() for answer in answerstring.split("|")]
 
 class TriviaGame:
 
