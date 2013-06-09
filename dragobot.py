@@ -941,7 +941,7 @@ trivialist = []
 
 def triviagrade(time, hints, answer):
 
-	time = max(time, hints * 20);
+	time = max(time, hints * 15);
 
 	grade = 100
 
@@ -981,6 +981,7 @@ class TriviaGame:
 		self.hintanswer = ""
 		self.hintsused = 0
 		self.hint_timers = []
+		self.timesuptimer = None
 
 		self.startGame()
 		print ("New game of trivia started by " + self.player + ".")
@@ -1004,9 +1005,11 @@ class TriviaGame:
 		send_message(self.player, "Q. %d of %d: %s" % (self.playedrounds, self.rounds, self.question.question))
 
 		self.hint_timers = []
-		for a in range(1, 7):
-			self.hint_timers.append(Timer(a*20, self.giveHint, ()))
-			self.hint_timers[a-1].start()
+		for a in range(7):
+			self.hint_timers.append(Timer((a+1)*15, self.giveHint, ()))
+			self.hint_timers[a].start()
+		self.timesuptimer = Timer(120, self.timeUp, ())
+		self.timesuptimer.start()
 	
 	def sendInput(self, msg):
 
@@ -1034,6 +1037,14 @@ class TriviaGame:
 			else:
 				self.over = True
 	
+	def timeUp(self):
+		send_message(self.player, "Time's up! The answer was: %s" % (self.question.answers[0]))
+		self.stop_timers()
+		if self.playedrounds < self.rounds:
+			self.startGame()
+		else:
+			self.over = True
+
 	def giveHint(self, arg=""):
 		global trivia_maxhints
 		if arg == "user" and self.hintsused >= trivia_maxhints:
@@ -1055,8 +1066,9 @@ class TriviaGame:
 	
 	def stop_timers(self):
 		# cancel all the remaining hint timers
-		for a in range(1, 7):
-			self.hint_timers[a-1].cancel()
+		for a in range(7):
+			self.hint_timers[a].cancel()
+		self.timesuptimer.cancel()
 
 
 
