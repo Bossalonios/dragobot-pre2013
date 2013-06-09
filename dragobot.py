@@ -1607,7 +1607,11 @@ def interp_message(message):
 	if command[0] in trivia_triggers:
 		for game in games:
 			if game.player == recipient and game.gametype == "trivia":
-				print (recipient + " already has a game in progress!")
+				if(len(command) > 1 and command[1] == "stop"):
+					game.over = True
+					send_message(recipient, "Trivia has been stopped. Type !trivia to restart.")
+				else:
+					print (recipient + " already has a game in progress!")
 				return
 		if(len(command) > 1 and command[1].isdigit()):
 			games.append(TriviaGame(recipient, int(command[1])))
