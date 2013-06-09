@@ -1585,6 +1585,7 @@ def interp_message(message):
 			if game.player == recipient and game.gametype == "namethatpokemon":
 				if(len(command) > 1 and command[1] == "stop"):
 					game.over = True
+					game.stop_timers()
 					send_message(recipient, "Game of Name That Pokémon stopped.")
 				else:
 					print (recipient + " already has a game in progress!")
