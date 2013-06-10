@@ -5,10 +5,10 @@ How many days are there in a year on Mars?
 What does the Roman acronym "S.P.Q.R." stand for?
 senatus populusque romanus
 In Dan Brown's book, "Angels and Demons", what did Vittoria do that constantly offended the Vatican population?
-wear shorts|wore shorts
+wear shorts|wore shorts|wearing shorts
 What is the longest word for a number in English in which every letter is different?
 five thousand
-Before Toronto became the largest city in Canada, what was the largest city?
+Before Toronto became the largest city in Canada, what was the largest city in Canada?
 Montreal|Montréal
 What's the address of the Prime Minister's residence?
 24 Sussex Drive
@@ -21,4 +21,21 @@ Apple
 As of 2013, how many generations of the iPod mini have there been?
 seven|7
 List the following Windows operating systems in order from earliest to latest: XP, ME, 98, 2000.
-98, 2000, ME, XP|98 2000 ME XP
+98, 2000, ME, XP|98 2000 ME XP|98,2000,ME,XP
+What is the speed of light?
+299792458 m/s|299792 km/s|186262 mi/s|186262 mps|299792458 m s^-1|1079252848 km/h|10.8 billion km/h|300000000 m/s|300000 km/s|186000 mps|670000000 mph|670 million mph|300 million m/s
+What colour is Dragobot's metallic exterior?
+blue and white|blue
+Which of these words are spelled differently in British English: valor, condor, stupor, flavor, algor
+valor, flavor|flavor, valor|valor and flavor|flavor and valor|valour, flavour|flavour, valour|valour and flavour|flavour and valour
+Which of these words are spelled differently in American English: criticise, advertise, realise, improvise, compromise
+realise, criticise|criticise, realise|realise and criticise|criticise and realise|realize, criticize|criticize, realize|realize and criticize|criticize and realize
+Which of these words are spelled differently in American English: ochre, lucre, spectre, ogre, umbre
+ochre, spectre|spectre, ochre|ochre and spectre|spectre and ochre|ocher, specter|specter, ocher|ocher and specter|specter and ocher
+Which of these words are NOT spelled differently in British English: cesium, calcium, aluminum, sulfur, francium
+calcium, francium|francium, calcium|calcium and francium|francium and calcium
+What is this question asking for?
+the answer to this question
+In cryptography, what is the magic word?
+squeamish ossifrage
+
