@@ -10,3 +10,15 @@ What is the longest word for a number in English in which every letter is differ
 five thousand
 Before Toronto became the largest city in Canada, what was the largest city?
 Montreal|Montréal
+What's the address of the Prime Minister's residence?
+24 Sussex Drive
+What year did Elvis die?
+1977
+Who played Data on Star Trek: The Next Generation?
+Brent Spiner
+What company made the first device to be called a "PDA"?
+Apple
+As of 2013, how many generations of the iPod mini have there been?
+seven|7
+List the following Windows operating systems in order from earliest to latest: XP, ME, 98, 2000.
+98, 2000, ME, XP|98 2000 ME XP
