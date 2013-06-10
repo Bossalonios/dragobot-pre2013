@@ -973,6 +973,13 @@ def trivia_lettergrade(grade):
 		return ["F", "Try a little harder next time."]
 	return ["FF", "Try harder next time."]
 
+def usclen(string): # returns how many underscores there are.
+	length = 0
+	for char in string:
+		if char == "_":
+			length += 1
+	return length
+
 class TriviaQuestion:
 
 	def __init__(self, question, answerstring):
@@ -1081,7 +1088,7 @@ class TriviaGame:
 			self.timesuptimer.start()
 
 			if(self.hintsused > 1):
-				for a in range((len(self.hintmask) * (self.hintsused - 1) / trivia_maxhints) - (len(self.hintmask) * (self.hintsused - 2) / trivia_maxhints)):
+				for a in range((usclen(self.hintmask) * (self.hintsused - 1) / trivia_maxhints) - (usclen(self.hintmask) * (self.hintsused - 2) / trivia_maxhints)):
 					char = randint(0, len(self.hintmask) - 1)
 					while self.hintmask[char] != "_":
 						char = randint(0, len(self.hintanswer) - 1)
