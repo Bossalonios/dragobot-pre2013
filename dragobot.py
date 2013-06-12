@@ -999,6 +999,7 @@ class TriviaGame:
 		self.roundstarttime = timer()
 
 		self.hintmask = []
+		self.hintmasklength = 0
 		self.hintanswer = ""
 		self.hintsused = 0
 		self.hinttimer = None
@@ -1022,6 +1023,7 @@ class TriviaGame:
 				self.hintmask.append("_")
 			else:
 				self.hintmask.append(a)
+		self.hintmasklength = usclen(self.hintmask)
 		
 		send_message(self.player, "Q. %d of %d: %s" % (self.playedrounds, self.rounds, self.question.question))
 
@@ -1088,7 +1090,7 @@ class TriviaGame:
 			self.timesuptimer.start()
 
 			if(self.hintsused > 1):
-				for a in range((usclen(self.hintmask) * (self.hintsused - 1) / trivia_maxhints) - (usclen(self.hintmask) * (self.hintsused - 2) / trivia_maxhints)):
+				for a in range((self.hintmasklength * (self.hintsused - 1) / trivia_maxhints) - (self.hintmasklength * (self.hintsused - 2) / trivia_maxhints)):
 					char = randint(0, len(self.hintmask) - 1)
 					while self.hintmask[char] != "_":
 						char = randint(0, len(self.hintanswer) - 1)
