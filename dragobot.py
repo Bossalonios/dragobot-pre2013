@@ -442,7 +442,7 @@ class HangmanGame:
 
 		else:
 			self.wrongguesses += 1
-			send_message(self.player, "No, no %s's. (Wrong guesses left: %s)" % (letter.upper, (self.maxwrongguesses - self.wrongguesses)))
+			send_message(self.player, "No, no %s's. (Wrong guesses left: %s)" % (letter.upper(), (self.maxwrongguesses - self.wrongguesses)))
 			if self.wrongguesses >= self.maxwrongguesses:
 				send_message(self.player, "Game over! The answer was: %s" % (self.theword))
 
