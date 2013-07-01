@@ -1542,6 +1542,7 @@ def parse_dragobot_command(message, sender, recipient):
 		default_message(recipient)
 
 
+rpn163 = RPN()
 
 
 
@@ -1669,14 +1670,17 @@ def interp_message(message):
 	# the 163 solver uses RPN
 	if command[0] == "!163solve":
 		if len(command) > 1:
-			_rpn.rpncalc(command[1].split(" "))
-			if(_rpn.message != ""):
-				send_message(recipient, _rpn.message)
+			rpn163.rpncalc(command[1].split(" "))
+			if(rpn163.message != ""):
+				send_message(recipient, rpn163.message)
 			else:
-				answer = _rpn.get_stacktop()
+				answer = rpn163.get_stacktop()
 				send_message(recipient, "Result: " + answer)
 				if(answer == 163):
 					send_message(recipient, "Congratulations, %s, you got it!" % msg.sender)
+				else:
+					send_message(recipient, "Too bad, %s! Try again." % msg.sender)
+				rpn163.rpncalc("AC")
 		else:
 			send_message("Please type in an expression.")
 		
