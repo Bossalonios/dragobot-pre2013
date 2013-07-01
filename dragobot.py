@@ -1653,7 +1653,6 @@ def interp_message(message):
 
 	# RPN tool
 	if command[0] == "!rpn":
-		# send_message(recipient, "RPN calculator still in construction. Come back later.")
 		if len(command) > 1:
 			_rpn.rpncalc(command[1].split(" "))
 			if(_rpn.message != ""):
@@ -1667,6 +1666,20 @@ def interp_message(message):
 			else:
 				send_message(recipient, "Result: " + _rpn.get_stacktop())
 
+	# the 163 solver uses RPN
+	if command[0] == "!163solve":
+		if len(command) > 1:
+			_rpn.rpncalc(command[1].split(" "))
+			if(_rpn.message != ""):
+				send_message(recipient, _rpn.message)
+			else:
+				answer = _rpn.get_stacktop()
+				send_message(recipient, "Result: " + answer)
+				if(answer == 163):
+					send_message(recipient, "Congratulations, %s, you got it!" % msg.sender)
+		else:
+			send_message("Please type in an expression.")
+		
 
 	# generic help trigger
 	if command[0] == "!help":
