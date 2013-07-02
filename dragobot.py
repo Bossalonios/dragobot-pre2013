@@ -1270,7 +1270,12 @@ def interp_chat(message):
 		recipient = message.receiver
 	else:
 		recipient = message.sender
-
+	
+	
+	if "/quit I'm a total idiot" in message.message:
+		send_message(recipient, "I'm a total idiot")
+		
+	
 	rawmessage = strippunc(message.message).lower()
 
 
