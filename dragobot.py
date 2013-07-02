@@ -1279,11 +1279,6 @@ def interp_chat(message):
 	rawmessage = strippunc(message.message).lower()
 
 
-	# responses to certain phrases
-	if rawmessage.find("spiffy is a coward") != -1:
-		send_message(recipient, "Spiffy is a cheater, not a coward.")
-	
-
 	# "open the pod bay doors" scene
 
 	if rawmessage.find("do you read me") != -1:
@@ -1302,11 +1297,6 @@ def interp_chat(message):
 		send_message(recipient, "Without your space helmet, %s? You're going to find that rather difficult." % message.sender)
 	if rawmessage.find("argue with you anymore") != -1:
 		send_message(recipient, "%s, this conversation can serve no purpose anymore. Goodbye." % message.sender)
-
-		
-	if "smuglord" in rawmessage and "is" in rawmessage and "druglord" in rawmessage and not "not" in rawmessage:
-		if rawmessage.find("smuglord") < rawmessage.find("is") and rawmessage.find("is") < rawmessage.find("druglord"):
-			send_message(recipient, "Smuglord is NOT Druglord!")
 
 
 
