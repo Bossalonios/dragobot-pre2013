@@ -1681,10 +1681,10 @@ def interp_message(message):
 			else:
 				answer = rpn163.get_stacktop()
 				send_message(recipient, "Result: " + answer)
-				if(answer == 163):
-					send_message(recipient, "Congratulations, %s, you got it!" % msg.sender)
+				if(answer == "163"):
+					send_message(recipient, "Congratulations, %s, you got it!" % message.sender)
 				else:
-					send_message(recipient, "Too bad, %s! Try again." % msg.sender)
+					send_message(recipient, "Too bad, %s! Try again." % message.sender)
 				rpn163.rpncalc("AC")
 		else:
 			send_message("Please type in an expression.")
