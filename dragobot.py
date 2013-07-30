@@ -1261,7 +1261,7 @@ class ApplesToApplesGame():
 
 		send_message(self.player, "The category is: %s" % self.categorycard)
 
-		self.choicestring = "  ".join(self.choicecards)
+		self.choicestring = " / ".join(self.choicecards)
 		send_message(self.player, "The choices are: %s" % self.choicestring)
 
 		self.over = True
@@ -1659,6 +1659,14 @@ def interp_message(message):
 				print (recipient + " already has a game in progress!")
 				return
 		games.append(OneSixtyThreeGame(recipient))
+
+	cah_triggers = ["!cardsagainsthumanity", "!cards", "!cah"]
+	if command[0] in cah_triggers:
+		for game in games:
+			if game.player == recipient and game.gametype == "apples":
+				print (recipient + " already has a game in progress!")
+				return
+		games.append(ApplesToApplesGame(recipient, "cah"))
 
 	apples_triggers = ["!applestoapples", "!apples", "!ata"]
 	if command[0] in apples_triggers:
