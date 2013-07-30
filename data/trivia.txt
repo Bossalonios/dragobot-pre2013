@@ -36,6 +36,7 @@ Which of these words are NOT spelled differently in British English: cesium, cal
 calcium, francium|francium, calcium|calcium and francium|francium and calcium
 What is this question asking for?
 the answer to this question
-In cryptography, what is the magic word?
-squeamish ossifrage
-
+Find the common phrase whose each syllable rhymes with: "The bowling cone? Rather go toss."
+A rolling stone gathers no moss
+Find the title of the game whose each syllable rhymes with: "Who pwnt yo' back?"
+You don't know jack
