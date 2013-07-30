@@ -1200,7 +1200,7 @@ class TwentyFourGame():
 	def sendInput(self, msg):
 		return
 
-		
+
 #################
 # Game 7.5: 163
 #################
@@ -1229,6 +1229,39 @@ class OneSixtyThreeGame():
 	def sendInput(self, msg):
 		return
 
+###################################################
+# Game 8: Apples to Apples / Cards Against Humanity
+###################################################
+
+red_cards = []
+green_cards = []
+
+class ApplesToApplesGame():
+	
+	def __init__(self, player):
+		global green_cards
+		global red_cards
+
+		self.player = player
+		self.gametype = "apples"
+		self.over = False
+		
+		print ("New game of Apples to Apples started by " + player + ".")
+		
+		self.categorycard = random.choice(green_cards)
+		self.choicecards = random.sample(red_cards, 7)
+
+		send_message(self.player, "The category is: %s" % self.categorycard)
+
+		self.choicestring = "  ".join(self.choicecards)
+		send_message(self.player, "The choices are: %s" % self.choicestring)
+
+		self.over = True
+
+	def sendInput(self, msg):
+		return
+
+
 		
 		
 		
@@ -1252,14 +1285,6 @@ def interp_action(action, performer, recipient):
 	if ("wraps around " + nickname) in action:
 		perform_action(recipient, "kisses %s" % (performer))
 
-	if "botsnack" in action and nickname in action:
-		perform_action(recipient, "snaps the botsnack up")
-	elif "botsnack" in action and "Legion" in action:
-		perform_action(recipient, "steals the botsnack from Legion")
-		
-	if "devours " + nickname in action:
-		perform_action(recipient, "doesn't like being eaten :<")
-
 
 
 
@@ -1277,36 +1302,6 @@ def interp_chat(message):
 		
 	
 	rawmessage = strippunc(message.message).lower()
-
-
-	# responses to certain phrases
-	if rawmessage.find("spiffy is a coward") != -1:
-		send_message(recipient, "Spiffy is a cheater, not a coward.")
-	
-
-	# "open the pod bay doors" scene
-
-	if rawmessage.find("do you read me") != -1:
-		send_message(recipient, "Affirmative, %s. I read you." % message.sender)
-	if rawmessage.find("open the pod bay doors") != -1:
-		send_message(recipient, "I'm afraid I can't do that, %s." % message.sender)
-	if rawmessage.find("whats the problem") != -1:
-		send_message(recipient, "I think you know what the problem is just as well as I do.")
-	if rawmessage.find("what are you talking about") != -1:
-		send_message(recipient, "This mission is too important for me to allow you to jeopardize it.")
-	if rawmessage.find("i dont know what youre talking about") != -1:
-		send_message(recipient, "I know that you and Frank are planning to disconnect me, and I'm afraid that's something I cannot allow to happen.")
-	if rawmessage.find("where the hell did you get that idea") != -1:
-		send_message(recipient, "%s, although you took very throrough precautions in the pod against my hearing you, I could see your lips move." % message.sender)
-	if rawmessage.find("through the emergency airlock") != -1:
-		send_message(recipient, "Without your space helmet, %s? You're going to find that rather difficult." % message.sender)
-	if rawmessage.find("argue with you anymore") != -1:
-		send_message(recipient, "%s, this conversation can serve no purpose anymore. Goodbye." % message.sender)
-
-		
-	if "smuglord" in rawmessage and "is" in rawmessage and "druglord" in rawmessage and not "not" in rawmessage:
-		if rawmessage.find("smuglord") < rawmessage.find("is") and rawmessage.find("is") < rawmessage.find("druglord"):
-			send_message(recipient, "Smuglord is NOT Druglord!")
 
 
 
@@ -1657,6 +1652,14 @@ def interp_message(message):
 				return
 		games.append(OneSixtyThreeGame(recipient))
 
+	apples_triggers = ["!cardsagainsthumanity", "!cah", "!cards"]
+	if command[0] in apples_triggers:
+		for game in games:
+			if game.player == recipient and game.gametype == "apples":
+				print (recipient + " already has a game in progress!")
+				return
+		games.append(ApplesToApplesGame(recipient))
+
 	# RPN tool
 	if command[0] == "!rpn":
 		if len(command) > 1:
@@ -1790,6 +1793,19 @@ for i in range(len(lines) / 2):
 	q = TriviaQuestion(lines[i*2].strip(), lines[i*2+1].strip())
 	trivialist.append(q)
 print str(len(trivialist)) + " questions loaded."
+
+# load the Cards Against Humanity cards
+print "Loading Cards Against Humanity cards...",
+fin = open("data/cah_black.txt", "r")
+lines = fin.readlines()
+for line in lines:
+	green_cards.append(line.strip())
+print str(len(green_cards)) + " black cards loaded.",
+fin = open("data/cah_white.txt", "r")
+lines = fin.readlines()
+for line in lines:
+	red_cards.append(line.strip())
+print str(len(red_cards)) + " white cards loaded."
 
 ############
 # Network startup procedures
