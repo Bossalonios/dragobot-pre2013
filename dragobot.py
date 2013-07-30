@@ -1807,12 +1807,12 @@ print "Loading Apples To Apples cards...",
 fin = open("data/ata_green.txt", "r")
 lines = fin.readlines()
 for line in lines:
-	green_cards.append(line.strip())
+	green_cards.append(line.split(" - ")[0].strip())
 print str(len(green_cards)) + " green cards loaded.",
 fin = open("data/ata_red.txt", "r")
 lines = fin.readlines()
 for line in lines:
-	red_cards.append(line.strip())
+	red_cards.append(line.split(" - ")[0].strip())
 print str(len(red_cards)) + " red cards loaded."
 
 # load the Cards Against Humanity cards
