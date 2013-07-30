@@ -1707,7 +1707,23 @@ def interp_message(message):
 				rpn163.rpncalc("AC")
 		else:
 			send_message("Please type in an expression.")
-		
+	
+	# so does the 24 solver
+	if command[0] == "!24solve":
+		if len(command) > 1:
+			rpn163.rpncalc(command[1].split(" "))
+			if(rpn163.message != ""):
+				send_message(recipient, rpn163.message)
+			else:
+				answer = rpn163.get_stacktop()
+				send_message(recipient, "Result: " + answer)
+				if(answer == 24):
+					send_message(recipient, "Congratulations, %s, you got it!" % msg.sender)
+				else:
+					send_message(recipient, "Too bad, %s! Try again." % msg.sender)
+				rpn163.rpncalc("AC")
+		else:
+			send_message("Please type in an expression.")
 
 	# generic help trigger
 	if command[0] == "!help":
