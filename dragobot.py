@@ -1236,9 +1236,13 @@ class OneSixtyThreeGame():
 red_cards = []
 green_cards = []
 
+white_cards = []
+black_cards = []
+
+
 class ApplesToApplesGame():
 	
-	def __init__(self, player):
+	def __init__(self, player, mode):
 		global green_cards
 		global red_cards
 
@@ -1248,8 +1252,12 @@ class ApplesToApplesGame():
 		
 		print ("New game of Apples to Apples started by " + player + ".")
 		
-		self.categorycard = random.choice(green_cards)
-		self.choicecards = random.sample(red_cards, 7)
+		if(mode == "apples"):
+			self.categorycard = random.choice(green_cards)
+			self.choicecards = random.sample(red_cards, 7)
+		elif(mode == "cah"):
+			self.categorycard = random.choice(black_cards)
+			self.choicecards = random.sample(white_cards, 7)
 
 		send_message(self.player, "The category is: %s" % self.categorycard)
 
@@ -1652,13 +1660,13 @@ def interp_message(message):
 				return
 		games.append(OneSixtyThreeGame(recipient))
 
-	apples_triggers = ["!cardsagainsthumanity", "!cah", "!cards"]
+	apples_triggers = ["!applestoapples", "!apples", "!ata"]
 	if command[0] in apples_triggers:
 		for game in games:
 			if game.player == recipient and game.gametype == "apples":
 				print (recipient + " already has a game in progress!")
 				return
-		games.append(ApplesToApplesGame(recipient))
+		games.append(ApplesToApplesGame(recipient, "apples"))
 
 	# RPN tool
 	if command[0] == "!rpn":
@@ -1794,18 +1802,31 @@ for i in range(len(lines) / 2):
 	trivialist.append(q)
 print str(len(trivialist)) + " questions loaded."
 
+# load the Apples To Apples cards
+print "Loading Apples To Apples cards...",
+fin = open("data/ata_green.txt", "r")
+lines = fin.readlines()
+for line in lines:
+	green_cards.append(line.strip())
+print str(len(green_cards)) + " green cards loaded.",
+fin = open("data/ata_red.txt", "r")
+lines = fin.readlines()
+for line in lines:
+	red_cards.append(line.strip())
+print str(len(red_cards)) + " red cards loaded."
+
 # load the Cards Against Humanity cards
 print "Loading Cards Against Humanity cards...",
 fin = open("data/cah_black.txt", "r")
 lines = fin.readlines()
 for line in lines:
-	green_cards.append(line.strip())
-print str(len(green_cards)) + " black cards loaded.",
+	black_cards.append(line.strip())
+print str(len(black_cards)) + " black cards loaded.",
 fin = open("data/cah_white.txt", "r")
 lines = fin.readlines()
 for line in lines:
-	red_cards.append(line.strip())
-print str(len(red_cards)) + " white cards loaded."
+	white_cards.append(line.strip())
+print str(len(white_cards)) + " white cards loaded."
 
 ############
 # Network startup procedures
