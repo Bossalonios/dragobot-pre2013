@@ -545,6 +545,7 @@ pokemonflavortexts = []
 typelist = ["Normal", "Fighting", "Flying", "Poison", "Ground", "Rock", "Bug", "Ghost", "Steel", "Fire", "Water", "Grass", "Electric", "Psychic", "Ice", "Dragon", "Dark"]
 
 repeats = []
+ntp_roundpause = 3
 
 class PokemonData:
 	
@@ -573,7 +574,7 @@ def pokemongrade(time, hints):
 
 	return grade
 	
-# Don't  the last (n) Pokémon.
+# Don't repeat the last (n) Pokémon.
 REPEATLIMIT = 50
 
 class NameThatPokemonGame:
@@ -588,6 +589,9 @@ class NameThatPokemonGame:
 		self.theword = ""
 		self.hintmask = ""
 		self.totalhints = 0
+
+		self.ai = False
+		self.nextroundtimer = None
 
 		self.rounds = rounds
 		if(rounds > 1):
@@ -615,10 +619,12 @@ class NameThatPokemonGame:
 		
 		send_message(player, "This Pokémon's dex entry is: %s" % (pokemonflavortexts[pokemon.ID - 1 + 649 * randint(0, 1)]))
 		# start the timer _after_ the message has been sent.
+		self.ai = True
 		self.starttime = timer()
 		self.elapstimestart = self.starttime + 4
 
 	def sendInput(self, msg):
+		if (self.ai == False): return
 		if (msg.receiver == self.player and self.player[0] == "#" or msg.sender == self.player):
 
 			# strip punctuation and stuff
@@ -635,7 +641,10 @@ class NameThatPokemonGame:
 				if self.rounds <= 0:
 					self.over = True
 				else:
-					self.startGame(self.player)
+					newplayer = self.player
+					self.ai = False
+					self.nextroundtimer = Timer(ntp_roundpause, self.startGame, [newplayer])
+					self.nextroundtimer.start()
 
 			elif msg.message.lower() == "!pokemonhint" or msg.message.lower() == "!ph":
 				
@@ -939,6 +948,7 @@ trivia_maxhints = 3
 
 trivia_hinterval = 15
 trivia_timeup = 60
+trivia_roundpause = 3
 
 trivialist = []
 
@@ -994,7 +1004,11 @@ class TriviaGame:
 		self.gametype = "trivia"
 		self.over = False
 		
+		if rounds > len(trivialist):
+			rounds = len(trivialist)
+			send_message(self.player, "Too many rounds (more than number of available questions). Reducing round number to %d." % rounds)
 		self.rounds = rounds
+		self.roundlist = random.sample(range(len(trivialist)), rounds)
 		self.playedrounds = 0
 		self.roundstarttime = timer()
 
@@ -1004,6 +1018,7 @@ class TriviaGame:
 		self.hintsused = 0
 		self.hinttimer = None
 		self.timesuptimer = None
+		self.nextroundtimer = None
 
 		self.startGame()
 		print ("New game of trivia started by " + self.player + ".")
@@ -1015,7 +1030,7 @@ class TriviaGame:
 		self.hintsused = 0
 		self.roundstarttime = timer()
 		
-		self.question = random.choice(trivialist)
+		self.question = trivialist[self.roundlist[self.playedrounds - 1]]
 		self.hintanswer = self.question.answers[0] # always use the first answer as the answer for giving hints
 		self.hintmask = []
 		for a in self.hintanswer:
@@ -1045,7 +1060,10 @@ class TriviaGame:
 			send_message(self.player, "Correct, %s! Your rank: %s (%.2f%%)" % (msg.sender, trivia_lettergrade(finalgrade)[0], finalgrade))
 			self.stop_timers()
 			if self.playedrounds < self.rounds:
-				self.startGame()
+				newplayer = self.player
+				self.ai = False
+				self.nextroundtimer = Timer(trivia_roundpause, self.startGame, [])
+				self.nextroundtimer.start()
 			else:
 				self.over = True
 
